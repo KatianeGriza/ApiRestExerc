@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.rest.repository.AnimaisRepository;
+import com.api.rest.service.AnimaisService;
 import com.api.rest.entidades.Animais;
 
 @RestController
@@ -23,6 +24,8 @@ public class AnimaisController {
 
 	@Autowired
 	AnimaisRepository repo;
+	@Autowired
+	AnimaisService service;
 
 	@GetMapping
 	public String xpto() {
@@ -37,25 +40,23 @@ public class AnimaisController {
 
 	@GetMapping("/animais/{idanimais}")
 	public ResponseEntity<Animais> getAnimaisById(@PathVariable("idanimais") Long idanimais) {
-		Optional<Animais> animais = repo.findById(idanimais);
-		return animais.isPresent() ? ResponseEntity.ok(animais.get()) : ResponseEntity.notFound().build();
+		return ResponseEntity.ok(service.consultarAnimaisPorId(idanimais));
 	}
 	@PostMapping("/animais")
 	public ResponseEntity<Animais> saveAnimais(@RequestBody Animais animais) {
-		Animais ct = repo.save(animais);
+		Animais ct = service.salvar(animais);
 		return ResponseEntity.status(HttpStatus.CREATED).body(ct);
 	}
 
 	@DeleteMapping("/animais/{idanimais}")
 	public ResponseEntity<Void> deleteAnimais(@PathVariable("idanimais") Long idanimais) {
-		repo.deleteById(idanimais);
+		service.excluirAnimais(idanimais);
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("/animais/{idanimais}")
 	public ResponseEntity<Animais> alteraAnimais(@PathVariable("idanimais") int idanimais,
 			@RequestBody Animais animais) {
-		return ResponseEntity.ok(repo.save(animais));
+		return ResponseEntity.ok(service.salvar(animais));
 	}
-
 }
